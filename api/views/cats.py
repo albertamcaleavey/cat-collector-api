@@ -3,6 +3,7 @@ from api.middleware import login_required, read_token
 
 from api.models.db import db
 from api.models.cat import Cat
+from api.models.feeding import Feeding
 
 cats = Blueprint('cats', 'cats')
 
@@ -51,6 +52,8 @@ def show(id):
   # .filter allows you to search by any column in a table
   cat = Cat.query.filter_by(id=id).first()
   cat_data = cat.serialize()
+  # add fed property to cat_data = a boolean value which is returned by the fed_for_today method
+  cat_data["fed"] = cat.fed_for_today()
   return jsonify(cat=cat_data), 200
 
 #----------------------------------------------
@@ -100,3 +103,30 @@ def delete(id):
   # returns a response with a success message, since you don't need to return data
   return jsonify(message="Success"), 200
 
+#----------------------------------------------
+
+# create feeding route
+@cats.route('/<id>/feedings', methods=["POST"])
+
+# create feeding controller
+@login_required
+def add_feeding(id):
+  data = request.get_json()
+  data["cat_id"] = id
+
+  profile = read_token(request)
+  cat = Cat.query.filter_by(id=id).first()
+
+  if cat.profile_id != profile["id"]:
+    return 'Forbidden', 403
+
+  feeding = Feeding(**data)
+  
+  db.session.add(feeding)
+  db.session.commit()
+
+  cat_data = cat.serialize()
+  # adds a fed property to the cat_data object - use this boolean for conditional rendering in React
+  cat_data["fed"] = cat.fed_for_today()
+
+  return jsonify(cat_data), 201
