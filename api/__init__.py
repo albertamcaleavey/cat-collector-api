@@ -31,7 +31,7 @@ def create_app(config):
   # ============ Register Blueprints ============
   app.register_blueprint(cats, url_prefix='/api/cats')
   app.register_blueprint(auth, url_prefix='/api/auth') 
-  from api.views.toys import toys
+  app.register_blueprint(toys, url_prefix='/api/toys') 
 
 
   return app

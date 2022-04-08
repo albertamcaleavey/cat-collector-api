@@ -10,7 +10,6 @@ toys = Blueprint('toys', 'toys')
 @toys.route('/', methods=["POST"])
 
 # create controller
-@toys.route('/', methods=["POST"]) 
 @login_required
 def create():
   data = request.get_json()
@@ -21,3 +20,12 @@ def create():
   db.session.add(toy)
   db.session.commit()
   return jsonify(toy.serialize()), 201
+
+
+# index toys route
+@toys.route('/', methods=["GET"])
+
+# index controller
+def index():
+  toys = Toy.query.all()
+  return jsonify([toy.serialize() for toy in toys]), 201
