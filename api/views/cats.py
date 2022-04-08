@@ -38,15 +38,42 @@ def index():
   return jsonify([cat.serialize() for cat in cats]), 200
 
 
-  # show cat route
+# show cat route
 @cats.route('/<id>', methods=["GET"])
 
 # show cat controller
+@cats.route('/<id>', methods=["GET"])
 def show(id):
   # .filter allows you to search by any column in a table
   cat = Cat.query.filter_by(id=id).first()
-  cat_data = cat.serlialize()
+  cat_data = cat.serialize()
   return jsonify(cat=cat_data), 200
+
+
+# update cat route
+@cats.route('/<id>', methods=["PUT"])
+
+# update cat controllers
+@cats.route('/<id>', methods=["PUT"]) 
+@login_required
+def update(id):
+  data = request.get_json()
+  profile = read_token(request)
+  cat = Cat.query.filter_by(id=id).first()
+# ensures that only the user who created the cat can update it
+  if cat.profile_id != profile["id"]:
+    # if its not the right user, return a 403
+    return 'Forbidden', 403
+# for loop that helps us update the properties of a cat for however many keys were provided in the form data
+  for key in data:
+    # accepts 3 args:
+    # cat = object you want to change
+    # key = property we want to set
+    # data[key = the value we want to apply to a given property)
+    setattr(cat, key, data[key])
+
+  db.session.commit()
+  return jsonify(cat.serialize()), 200
 
 
 
