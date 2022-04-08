@@ -6,6 +6,8 @@ from api.models.cat import Cat
 
 cats = Blueprint('cats', 'cats')
 
+#----------------------------------------------
+
 # create cats route
 @cats.route('/', methods=["POST"])
 
@@ -26,6 +28,7 @@ def create():
   # return a JSON response with the newly created cat data and status code of 201 **make sure to include status code in projects!!
   return jsonify(cat.serialize()), 201
 
+  #----------------------------------------------
 
 # indexing cats route
 @cats.route('/', methods=["GET"])
@@ -37,6 +40,7 @@ def index():
   # return a JSON response with all of the serialized cats
   return jsonify([cat.serialize() for cat in cats]), 200
 
+#----------------------------------------------
 
 # show cat route
 @cats.route('/<id>', methods=["GET"])
@@ -49,6 +53,7 @@ def show(id):
   cat_data = cat.serialize()
   return jsonify(cat=cat_data), 200
 
+#----------------------------------------------
 
 # update cat route
 @cats.route('/<id>', methods=["PUT"])
@@ -75,6 +80,7 @@ def update(id):
   db.session.commit()
   return jsonify(cat.serialize()), 200
 
+#----------------------------------------------
 
 # delete route
 @cats.route('/<id>', methods=["DELETE"])
