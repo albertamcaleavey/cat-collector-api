@@ -76,4 +76,21 @@ def update(id):
   return jsonify(cat.serialize()), 200
 
 
+# delete route
+@cats.route('/<id>', methods=["DELETE"])
+
+# delete controller
+@cats.route('/<id>', methods=["DELETE"]) 
+@login_required
+def delete(id):
+  profile = read_token(request)
+  cat = Cat.query.filter_by(id=id).first()
+
+  if cat.profile_id != profile["id"]:
+    return 'Forbidden', 403
+# deletes the row (cat instance) from the table
+  db.session.delete(cat)
+  db.session.commit()
+  # returns a response with a success message, since you don't need to return data
+  return jsonify(message="Success"), 200
 
